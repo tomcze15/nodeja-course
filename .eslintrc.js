@@ -11,7 +11,7 @@ module.exports = {
     sourceType: 'module'
   },
   rules: {
-    'no-unused-vars': 'off',
+    'no-unused-vars': 'warn',
     'linebreak-style': 'off',
     'comma-dangle': ['error', 'never'],
     'object-shorthand': ['warn', 'methods'],
