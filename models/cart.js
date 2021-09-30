@@ -25,28 +25,47 @@ module.exports = class Cart {
         updatedProduct = { id, qty: 1 };
         cart.products = [...cart.products, updatedProduct];
       }
-      cart.totalPrice += +productPrice;
+      cart.totalPrice += (+productPrice);
       fs.writeFile(pathToCartJson, JSON.stringify(cart), (e) => {
         console.log(e);
       });
     });
   }
-  // static addProduct(id, price) {
-  //   fs.readFile(pathToCartJson, (err, fileContent) => {
-  //     let cart = { products: [], totalPrice: 0 };
-  //     if (!err) {
-  //       cart = JSON.parse(fileContent);
-  //     }
-  //     const exisitingProdIndex = cart.products.findIndex((item) => item.id === id);
-  //     if (exisitingProdIndex !== -1) {
-  //       cart.products[exisitingProdIndex].qty += 1;
-  //     } else {
-  //       cart.products.push({ id, qty: 1 });
-  //     }
-  //     cart.totalPrice += +price;
-  //     fs.writeFile(pathToCartJson, JSON.stringify(cart), (e) => {
-  //       console.log(e);
-  //     });
-  //   });
-  // }
+
+  static deleteProduct(id, productPrice) {
+    fs.readFile(pathToCartJson, (err, fileContent) => {
+      if (err) {
+        return null;
+      }
+
+      const updatedCart = { ...JSON.parse(fileContent) };
+      const product = updatedCart.products.find((prod) => prod.id === id);
+
+      if (!product) {
+        return null;
+      }
+
+      updatedCart.products = updatedCart.products.filter((prod) => prod.id !== id);
+      updatedCart.totalPrice -= productPrice * product.qty;
+
+      if (updatedCart.totalPrice < 0.01) {
+        updatedCart.totalPrice = 0;
+      }
+
+      return fs.writeFile(pathToCartJson, JSON.stringify(updatedCart), (e) => {
+        console.log(e);
+      });
+    });
+  }
+
+  static getCart(cb) {
+    fs.readFile(pathToCartJson, (err, fileContent) => {
+      const cart = JSON.parse(fileContent);
+      if (err) {
+        cb(null);
+      } else {
+        cb(cart);
+      }
+    });
+  }
 };

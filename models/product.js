@@ -1,17 +1,5 @@
-const fs = require('fs');
-const path = require('path');
-const rootDir = require('../util/path');
-
-const pathToProductsJson = path.join(rootDir, 'data', 'products.json');
-
-const getProductsFromFile = (callback) => {
-  fs.readFile(pathToProductsJson, (err, fileContent) => {
-    if (err) {
-      return callback([]);
-    }
-    return callback(JSON.parse(fileContent));
-  });
-};
+const db = require('../util/database');
+const Cart = require('./cart');
 
 module.exports = class Product {
   constructor(id, title, imageUrl, description, price) {
@@ -23,40 +11,23 @@ module.exports = class Product {
   }
 
   save() {
-    getProductsFromFile((products) => {
-      if (this.id) {
-        const existingProductIndex = products.findIndex((prod) => prod.id === this.id);
-        const updatedProducts = [...products];
-        updatedProducts[existingProductIndex] = this;
-        fs.writeFile(pathToProductsJson, JSON.stringify(updatedProducts), (e) => {
-          if (e) {
-            products.pop();
-          }
-          console.log(e);
-        });
-      } else {
-        this.id = Math.random().toString();
-        if (products.find((product) => product.title === this.title)) {
-          return;
-        }
-        products.push(this);
-        fs.writeFile(pathToProductsJson, JSON.stringify(products), (e) => {
-          if (e) {
-            products.pop();
-          }
-          console.log(e);
-        });
-      }
-    });
+    return db.execute('INSERT INTO products (title, price, imageUrl, description) VALUES(?, ?, ?, ?)', [
+      this.title,
+      this.price,
+      this.imageUrl,
+      this.description
+    ]);
   }
 
-  static fetchAll(callback) {
-    getProductsFromFile(callback);
+  static deleteById(id) {
+
   }
 
-  static findById(id, cb) {
-    getProductsFromFile((products) => {
-      cb(products.find((p) => p.id === id));
-    });
+  static fetchAll() {
+    return db.execute('SELECT * FROM products');
+  }
+
+  static findById(id) {
+    return db.execute('SELECT * from products WHERE products.id = ?', [id]);
   }
 };
