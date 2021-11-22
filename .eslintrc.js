@@ -16,6 +16,7 @@ module.exports = {
     'comma-dangle': ['error', 'never'],
     'object-shorthand': ['warn', 'methods'],
     'class-methods-use-this': 'off',
-    'dot-notation': 'off'
+    'dot-notation': 'off',
+    'no-underscore-dangle': 'allow'
   }
 };
