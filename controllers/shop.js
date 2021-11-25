@@ -63,10 +63,19 @@ exports.getCart = (req, res) => {
 
 exports.postCart = (req, res) => {
   const prodId = req.body.productId;
-  Product.findById(prodId, (product) => {
-    Cart.addProduct(prodId, product.price);
-  });
-  res.redirect('/cart');
+
+  Product.findById(prodId)
+    .then(product => {
+      return req.user.addToCart(product);
+    })
+    .then(result => {
+      console.log(result);
+    })
+
+  // Product.findById(prodId, (product) => {
+  //   Cart.addProduct(prodId, product.price);
+  // });
+  // res.redirect('/cart');
 };
 
 exports.postCartDeleteProduct = (req, res) => {

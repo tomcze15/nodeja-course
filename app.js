@@ -9,6 +9,7 @@ const mongoConnect = require('./util/database').mongoConnect;
 const User = require('./models/user');
 
 const app = express();
+const userId = '619bd0574eee0434e015091a';
 
 app.set('view engine', 'ejs');
 app.set('views', 'views');
@@ -17,9 +18,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(rootDir, 'public')));
 
 app.use((req, res, next) => {
-  User.findById('619bd0574eee0434e015091a')
+  User.findById(userId)
     .then(user => {
-      req.user = user;
+      req.user = new User(user.name, user.email, user.cart, userId);
       next();
     })
     .catch(err => console.log(err));
